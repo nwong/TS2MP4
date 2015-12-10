@@ -204,7 +204,10 @@ static double const UndefinedFPS = -1.0;
             self.status = KMMediaAssetExportSessionStatusFailed;
             return UndefinedFPS;
         }
-        if(previous_video_fps != UndefinedFPS && previous_video_fps != current_video_fps)
+        // allow videos files that have close frame rates to be concatenated
+#define MAX_FPS_DIFFERENCE_ALLOWED (double)1.1
+        if(previous_video_fps != UndefinedFPS && (fabs(previous_video_fps - current_video_fps) > MAX_FPS_DIFFERENCE_ALLOWED))
+//        if(previous_video_fps != UndefinedFPS && previous_video_fps != current_video_fps)
         {
             self.error = [NSError errorWithDomain:KMMediaAssetExportSessionErrorDomain code:KMMediaAssetExportSessionErrorCodeDemuxOperationFailed userInfo:@{NSLocalizedDescriptionKey:@"All video elementary stream are not at the same FPS."}];
             self.status = KMMediaAssetExportSessionStatusFailed;
